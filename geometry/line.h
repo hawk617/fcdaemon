@@ -10,16 +10,16 @@ public:
 	CLine(CPoint<T> p1, CPoint<T> p2);
 	~CLine(void);
 
-	T GetA () {return a;};
-	T GetB () {return b;};
-	T GetC () {return c;};
-	T GetD2 () {return d2;};
+	T GetA ();
+	T GetB ();
+	T GetC ();
+	T GetD2 ();
 
 	T GetX (T y);
 	T GetY (T x);
 
 	CLine<T>& operator=(const CLine<T>& right) {
-		//проверка на самоприсваивание
+		//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (this == &right) {return *this;}
 		a = right.a;
 		b = right.b;
@@ -34,13 +34,13 @@ private:
 	T c;
 	T d2; //  d2 = a*a+b*b
 public:
-	// расстояние от точки до прямой
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	T Distance(CPoint<T> p);
-	// расчет проекции точки на прямую
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	CPoint<T> Projection(CPoint<T> p);
-	// возвращает точку пересечения с линией
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	CPoint<T> Cross(CLine<T> l);
-	// // проверка на параллельность
+	// // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	bool IsCross(CLine<T> l);
 };
 
@@ -74,11 +74,11 @@ CLine<T>::CLine(CPoint<T> p1, CPoint<T> p2)
 	d2=a*a+b*b;
 }
 
-// расстояние от точки до прямой
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 template <typename T>
 T CLine<T>::Distance(CPoint<T> p)
 {
-	if (a==0 && b==0) return 0; // прямая неопределена
+	if (a==0 && b==0) return 0; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 	CPoint<T> dp;
 	dp=Projection (p);
@@ -86,21 +86,21 @@ T CLine<T>::Distance(CPoint<T> p)
 	return dp.Abs ();
 }
 
-// расчет проекции точки на прямую
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 template <typename T>
 CPoint<T> CLine<T>::Projection(CPoint<T> p)
 {
-	if (a==0 && b==0) return CPoint<T>(0,0); // прямая неопределена
+	if (a==0 && b==0) return CPoint<T>(0,0); // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-	return CPoint<T> ((b*b*p.x-c*a-a*b*p.y)/d2, (a*a*p.y-a*b*p.x-c*b)/d2); // вот такая закорюка
+	return CPoint<T> ((b*b*p.x-c*a-a*b*p.y)/d2, (a*a*p.y-a*b*p.x-c*b)/d2); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 }
 
-// возвращает точку пересечения с линией
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 template <typename T>
 CPoint<T> CLine<T>::Cross(CLine<T> l)
 {
-	if (!IsCross(l)) return CPoint<T>(0,0); // если не пересеклись возвращаем что-нибудь
+	if (!IsCross(l)) return CPoint<T>(0,0); // пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ
 
 	T x, y;
 	x=(l.GetC()*b-c*l.GetB())/(a*l.GetB()-b*l.GetA());
@@ -108,23 +108,37 @@ CPoint<T> CLine<T>::Cross(CLine<T> l)
 	return CPoint<T> (x, y);
 }
 
-// // проверка на параллельность
+// // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 template <typename T>
-bool CLine<T>::IsCross(CLine<T> l)
+inline bool CLine<T>::IsCross(CLine<T> l)
 {
 	return (a*l.b-b*l.a)!=0;
 }
 
 template <typename T>
-T CLine<T>::GetX (T y)
+inline T CLine<T>::GetX (T y)
 {
 	return (a==0)?0:(y*b+c)/(-a);
 }
 
 template <typename T>
-T CLine<T>::GetY (T x)
+inline T CLine<T>::GetY (T x)
 {
 	return (b==0)?0:(x*a+c)/(-b);
 }
+
+template <typename T>
+inline T CLine<T>::GetA () {return a;}
+
+template <typename T>
+inline T CLine<T>::GetB () {return b;}
+
+template <typename T>
+inline T CLine<T>::GetC () {return c;}
+
+template <typename T>
+inline T CLine<T>::GetD2 () {return d2;}
+
+
 
 

@@ -6,6 +6,7 @@
 #include <math.h>
 #include "fl.h"
 
+using cv::Mat;
 
 void FL::start (const FP &p)
 {
@@ -33,8 +34,8 @@ bool FL::test_rot()
 {
 	printf ("[fl]: test rotate\n");
 	
-	namedWindow("test rot original",CV_WINDOW_AUTOSIZE);
-	namedWindow("test rot lines",CV_WINDOW_AUTOSIZE);
+	cv::namedWindow("test rot original",CV_WINDOW_AUTOSIZE);
+	cv::namedWindow("test rot lines",CV_WINDOW_AUTOSIZE);
 
 	VideoCam cam;
 	cam.InitVideo(M_PI*70/180, M_PI*50/180, M_PI*20/180);
@@ -55,12 +56,12 @@ bool FL::test_rot()
 			pRot/=1.05;
 		}
 
-		circle (cam.visimg,Point_<double>(pRot.x, pRot.y),radius,CV_RGB(255,255,250),1,8);
-		line (cam.visimg, Point_<double>(pRot.x-radius/2, pRot.y-radius/2), Point_<double>(pRot.x+radius/2, pRot.y+radius/2),CV_RGB(255,255,250),1,8);
-		line (cam.visimg, Point_<double>(pRot.x-radius/2, pRot.y+radius/2), Point_<double>(pRot.x+radius/2, pRot.y-radius/2),CV_RGB(255,255,250),1,8);
+		cv::circle (cam.visimg,cv::Point_<double>(pRot.x, pRot.y),radius,CV_RGB(255,255,250),1,8);
+		cv::line (cam.visimg, cv::Point_<double>(pRot.x-radius/2, pRot.y-radius/2), cv::Point_<double>(pRot.x+radius/2, pRot.y+radius/2),CV_RGB(255,255,250),1,8);
+		cv::line (cam.visimg, cv::Point_<double>(pRot.x-radius/2, pRot.y+radius/2), cv::Point_<double>(pRot.x+radius/2, pRot.y-radius/2),CV_RGB(255,255,250),1,8);
 
-		imshow ( "test rot original", cam.capt_img );
-		imshow ( "test rot lines", cam.visimg );
+		cv::imshow ( "test rot original", cam.capt_img );
+		cv::imshow ( "test rot lines", cam.visimg );
 
 
 		char c = cvWaitKey(33);//33
@@ -73,8 +74,8 @@ bool FL::test_rot()
 		}
 	}
 
-	destroyWindow("test rot original");
-	destroyWindow("test rot lines");
+	cv::destroyWindow("test rot original");
+	cv::destroyWindow("test rot lines");
 	return true;
 }
 
@@ -82,8 +83,8 @@ bool FL::test_apert()
 {
 	printf ("[fl]: test aperture\n");
 
-	namedWindow("test apert original",CV_WINDOW_AUTOSIZE);
-	namedWindow("test apert lines",CV_WINDOW_AUTOSIZE);
+	cv::namedWindow("test apert original",CV_WINDOW_AUTOSIZE);
+	cv::namedWindow("test apert lines",CV_WINDOW_AUTOSIZE);
 
 	VideoCam cam;
 	cam.InitVideo(M_PI*70/180, M_PI*50/180, M_PI*20/180);
@@ -104,9 +105,9 @@ bool FL::test_apert()
 			pRot/=1.05;
 		}
 
-		circle (cam.visimg,Point_<double>(pRot.x, pRot.y),radius,CV_RGB(255,255,250),1,8);
-		line (cam.visimg, Point_<double>(pRot.x-radius/2, pRot.y-radius/2), Point_<double>(pRot.x+radius/2, pRot.y+radius/2),CV_RGB(255,255,250),1,8);
-		line (cam.visimg, Point_<double>(pRot.x-radius/2, pRot.y+radius/2), Point_<double>(pRot.x+radius/2, pRot.y-radius/2),CV_RGB(255,255,250),1,8);
+		circle (cam.visimg,cv::Point_<double>(pRot.x, pRot.y),radius,CV_RGB(255,255,250),1,8);
+		line (cam.visimg, cv::Point_<double>(pRot.x-radius/2, pRot.y-radius/2), cv::Point_<double>(pRot.x+radius/2, pRot.y+radius/2),CV_RGB(255,255,250),1,8);
+		line (cam.visimg, cv::Point_<double>(pRot.x-radius/2, pRot.y+radius/2), cv::Point_<double>(pRot.x+radius/2, pRot.y-radius/2),CV_RGB(255,255,250),1,8);
 
 		imshow ( "test apert original", cam.capt_img );
 		imshow ( "test apert lines", cam.visimg );
@@ -122,8 +123,8 @@ bool FL::test_apert()
 		}
 	}
 
-	destroyWindow("test apert original");
-	destroyWindow("test apert lines");
+	cv::destroyWindow("test apert original");
+	cv::destroyWindow("test apert lines");
 	return true;
 }
 

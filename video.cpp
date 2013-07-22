@@ -13,7 +13,7 @@ VideoCam::VideoCam (double h_angle, double v_angle, double dv_angle)
 
 }
 
-// инициализация необходимых констант
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 void VideoCam::InitVideo (double h_angle, double v_angle, double dv_angle)
 {
 	config.FrameSize.x=720;
@@ -37,13 +37,13 @@ void VideoCam::vSetDVAngle (double ang)
 	config.y_hor=(int)(config.FrameSize.x/2 - config.vDist*tan (ang));
 }
 
-// конфигурация 
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 
 void VideoCam::vSetConfig (vConfig &conf)
 {
 	config=conf;
 }
 
-// захват видео
+// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 int VideoCam::Capture ()
 {
 	Mat frame;
@@ -68,7 +68,7 @@ int VideoCam::SetVideoSource(char* f)
 	return 0;
 }
 
-// эмуляция захвата видео
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 int VideoCam::Capture (Mat& image)
 {
 	capt_img=image.clone();
@@ -86,16 +86,13 @@ Mat VideoCam::GetCVFrame ()
 }
 
 
-// рассчет точки поворота за угол
 CDPoint VideoCam::vDirectionRotate (Mat& image, bool vis, Mat& visimg)
 {
-	vector<Vec4i> lines;
+	std::vector<cv::Vec4i> lines;
 
-	// фильтруем картинку
 	vFilterImage (image, tempImg);
 
-	// распознаем прямые линии
-	HoughLinesP( tempImg, lines, 1, CV_PI/180, 50, 50, 30 );
+	cv::HoughLinesP( tempImg, lines, 1, CV_PI/180, 50, 50, 30 );
 	int nsect=lines.size();
 
 	for(unsigned int i = 0; i < lines.size(); i++ )
@@ -107,23 +104,20 @@ CDPoint VideoCam::vDirectionRotate (Mat& image, bool vis, Mat& visimg)
 	CDPoint min = CDPoint(0, config.FrameSize.x);
 	CDSection ms, hs;
 	double t_cos, t_sin, hg=config.FrameSize.x;
-	// собственно поиск точки  ... пока очень и очень грубо
 	for (int i=0; i<nsect; i++)
 	{
 		t_cos=sect[i].cos();
 		t_sin=sect[i].sin();
 
-		// определяем левую границу стены и пола
 		if (sect[i].InRect(0, config.FrameSize.y/2, 0, config.FrameSize.x))
 			if(t_cos < 0 &&  0.5 < t_sin)
 			{
 				if (sect[i].GetP1().y<min.y) {min=sect[i].GetP1();ms=sect[i];};
 				if (sect[i].GetP2().y<min.y) {min=sect[i].GetP2();ms=sect[i];};
-				line( visimg, Point(sect[i].GetP1().x, sect[i].GetP1().y), Point(sect[i].GetP2().x, sect[i].GetP2().y), CV_RGB(0,255,0), 2, CV_AA, 0 );
+				line( visimg, cv::Point(sect[i].GetP1().x, sect[i].GetP1().y), cv::Point(sect[i].GetP2().x, sect[i].GetP2().y), CV_RGB(0,255,0), 2, CV_AA, 0 );
 				continue;
 			}
 
-			// определяем границу встречной стены и пола
 			if (sect[i].InRect(0, config.FrameSize.y, config.y_hor, min.y) &&
 				-0.05 <t_sin &&  t_sin< 0.05)
 			{
@@ -135,21 +129,20 @@ CDPoint VideoCam::vDirectionRotate (Mat& image, bool vis, Mat& visimg)
 	to.y=(to.y+hg)/2;
 	to.x=ms.GetX(to.y);
 
-	// на случай необходимости визуализировать процесс
 	if (vis)
 	{
 		cvtColor(tempImg, visimg, CV_GRAY2RGB);
 		for(unsigned int i = 0; i < lines.size(); i++ )
 		{
-			line( visimg, Point (lines[i][0], lines[i][1]), Point (lines[i][2], lines[i][3]), CV_RGB(255,0,0), 2, CV_AA, 0 );
+			line( visimg, cv::Point (lines[i][0], lines[i][1]), cv::Point (lines[i][2], lines[i][3]), CV_RGB(255,0,0), 2, CV_AA, 0 );
 		}
-		line( visimg, Point(ms.GetP1().x, ms.GetP1().y), Point(ms.GetP2().x, ms.GetP2().y), CV_RGB(0,255,0), 2, CV_AA, 0 );
-		line( visimg, Point(hs.GetP1().x, hs.GetP1().y), Point(hs.GetP2().x, hs.GetP2().y), CV_RGB(200,0,150), 2, CV_AA, 0 );
+		line( visimg, cv::Point(ms.GetP1().x, ms.GetP1().y), cv::Point(ms.GetP2().x, ms.GetP2().y), CV_RGB(0,255,0), 2, CV_AA, 0 );
+		line( visimg, cv::Point(hs.GetP1().x, hs.GetP1().y), cv::Point(hs.GetP2().x, hs.GetP2().y), CV_RGB(200,0,150), 2, CV_AA, 0 );
 
 		int radius=5;
-		circle(visimg,Point(to.x, to.y),radius,CV_RGB(0,0,250),1,8);
-		line(visimg, Point(to.x-radius/2, to.y-radius/2), Point(to.x+radius/2, to.y+radius/2),CV_RGB(0,0,250),1,8);
-		line(visimg, Point(to.x-radius/2, to.y+radius/2), Point(to.x+radius/2, to.y-radius/2),CV_RGB(0,0,250),1,8);
+		cv::circle(visimg,cv::Point(to.x, to.y),radius,CV_RGB(0,0,250),1,8);
+		cv::line(visimg, cv::Point(to.x-radius/2, to.y-radius/2), cv::Point(to.x+radius/2, to.y+radius/2),CV_RGB(0,0,250),1,8);
+		line(visimg, cv::Point(to.x-radius/2, to.y+radius/2), cv::Point(to.x+radius/2, to.y-radius/2),CV_RGB(0,0,250),1,8);
 	}
 
 	return to;
@@ -157,12 +150,12 @@ CDPoint VideoCam::vDirectionRotate (Mat& image, bool vis, Mat& visimg)
 
 CDPoint VideoCam::vDirectionRotate ()
 {
-	vector<Vec4i> lines;
+	std::vector<cv::Vec4i> lines;
 
-	// фильтруем картинку
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	vFilterImage (capt_img, tempImg);
 
-	// распознаем прямые линии
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	HoughLinesP( tempImg, lines, 1, CV_PI/180, 50, 50, 30 );
 	int nsect=lines.size();
 
@@ -174,23 +167,23 @@ CDPoint VideoCam::vDirectionRotate ()
 	CDPoint min = CDPoint(0, config.FrameSize.y);
 	CDSection ms, hs;
 	double t_cos, t_sin, hg=config.FrameSize.y;
-	// собственно поиск точки  ... пока очень и очень грубо
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ  ... пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	for (int i=0; i<nsect; i++)
 	{
 		t_cos=sect[i].cos();
 		t_sin=sect[i].sin();
 
-		// определяем левую границу стены и пола
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ
 		if (sect[i].InRect(0, config.FrameSize.x/2, 0, config.FrameSize.y))
 			if(t_cos < 0 &&  0.5 < t_sin)
 			{
 				if (sect[i].GetP1().y<min.y) {min=sect[i].GetP1();ms=sect[i];};
 				if (sect[i].GetP2().y<min.y) {min=sect[i].GetP2();ms=sect[i];};
-				line ( visimg, Point(sect[i].GetP1().x, sect[i].GetP1().y), Point(sect[i].GetP2().x, sect[i].GetP2().y), CV_RGB(0,255,0), 2, CV_AA, 0 );
+				line ( visimg, cv::Point(sect[i].GetP1().x, sect[i].GetP1().y), cv::Point(sect[i].GetP2().x, sect[i].GetP2().y), CV_RGB(0,255,0), 2, CV_AA, 0 );
 				continue;
 			}
 
-			// определяем границу встречной стены и пола
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ
 			if (sect[i].InRect(0, config.FrameSize.y, config.y_hor, min.y) &&
 				-0.05 <t_sin &&  t_sin< 0.05)
 			{
@@ -202,35 +195,35 @@ CDPoint VideoCam::vDirectionRotate ()
 	to.y=(to.y+hg)/2;
 	to.x=ms.GetX(to.y);
 
-	// на случай необходимости визуализировать процесс
+	// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	if (vis)
 	{
 		cvtColor(tempImg, visimg, CV_GRAY2RGB);
 		for(unsigned int i = 0; i < lines.size(); i++ )
 		{
-			line( visimg, Point (lines[i][0], lines[i][1]), Point (lines[i][2], lines[i][3]), CV_RGB(255,0,0), 2, CV_AA, 0 );
+			line( visimg, cv::Point (lines[i][0], lines[i][1]), cv::Point (lines[i][2], lines[i][3]), CV_RGB(255,0,0), 2, CV_AA, 0 );
 		}
-		line( visimg, Point(ms.GetP1().x, ms.GetP1().y), Point_<double>(ms.GetP2().x, ms.GetP2().y), CV_RGB(0,255,0), 2, CV_AA, 0 );
-		line( visimg, Point_<double>(hs.GetP1().x, hs.GetP1().y), Point_<double>(hs.GetP2().x, hs.GetP2().y), CV_RGB(200,0,150), 2, CV_AA, 0 );
+		line( visimg, cv::Point(ms.GetP1().x, ms.GetP1().y), cv::Point_<double>(ms.GetP2().x, ms.GetP2().y), CV_RGB(0,255,0), 2, CV_AA, 0 );
+		line( visimg, cv::Point_<double>(hs.GetP1().x, hs.GetP1().y), cv::Point_<double>(hs.GetP2().x, hs.GetP2().y), CV_RGB(200,0,150), 2, CV_AA, 0 );
 
 		int radius=5;
-		circle(visimg,Point_<double>(to.x, to.y),radius,CV_RGB(0,0,250),1,8);
-		line(visimg, Point_<double>(to.x-radius/2, to.y-radius/2), Point_<double>(to.x+radius/2, to.y+radius/2),CV_RGB(0,0,250),1,8);
-		line(visimg, Point_<double>(to.x-radius/2, to.y+radius/2), Point_<double>(to.x+radius/2, to.y-radius/2),CV_RGB(0,0,250),1,8);
+		circle(visimg,cv::Point_<double>(to.x, to.y),radius,CV_RGB(0,0,250),1,8);
+		line(visimg, cv::Point_<double>(to.x-radius/2, to.y-radius/2), cv::Point_<double>(to.x+radius/2, to.y+radius/2),CV_RGB(0,0,250),1,8);
+		line(visimg, cv::Point_<double>(to.x-radius/2, to.y+radius/2), cv::Point_<double>(to.x+radius/2, to.y-radius/2),CV_RGB(0,0,250),1,8);
 	}
 
 	return to;
 }
 
-// рассчет точки прохода проема
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 CDPoint VideoCam::vDirectionAperture (Mat& image, bool vis, Mat& visimg)
 {
-	vector<Vec4i> lines;
+	std::vector<cv::Vec4i> lines;
 
-	// фильтруем картинку
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	vFilterImage (image, tempImg);
 
-	// распознаем прямые линии
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	HoughLinesP( tempImg, lines, 1, CV_PI/180, 50, 50, 30 );
 	int nsect=lines.size();
 
@@ -239,16 +232,16 @@ CDPoint VideoCam::vDirectionAperture (Mat& image, bool vis, Mat& visimg)
 		sect[i]=CDSection (CDPoint (lines[i][0], lines[i][1]), CDPoint (lines[i][2], lines[i][3]));
 	}
 
-	// собственно поиск точки
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 
 
 	
-	// рисуем если надо
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 	if (vis)
 	{
 		for(unsigned int i = 0; i < lines.size(); i++ )
 		{
-			line ( visimg, Point(lines[i][0],lines[i][1]), Point(lines[i][2],lines[i][3]), CV_RGB(255,0,0), 2, CV_AA, 0 );
+			line ( visimg, cv::Point(lines[i][0],lines[i][1]), cv::Point(lines[i][2],lines[i][3]), CV_RGB(255,0,0), 2, CV_AA, 0 );
 		}
 
 	}
@@ -267,14 +260,14 @@ void VideoCam::vFilterImage ( Mat& source, Mat& dest)
 }
 
 
-// поиск места поворота на изображении
+// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 int VideoCam::SearchRot(void)
 {
 	return 0;
 }
 
 
-// поиск прохода по изображению
+// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 int VideoCam::SearchApert(void)
 {
 	return 0;

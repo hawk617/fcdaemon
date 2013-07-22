@@ -15,7 +15,7 @@ public:
 	~FP() {};
 
 	typedef bool (*fp)();
-	vector<fp> plan;
+	std::vector<fp> plan;
 };
 
 class FL

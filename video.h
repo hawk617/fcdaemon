@@ -6,20 +6,22 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "geometry/geometry.h"
 
-using namespace std;
-using namespace cv;
+//using namespace std;
+//using namespace cv;
+
+using cv::Mat;
 
 #define MAX_SECT 5000
 
 
 typedef struct vConfig 
 {
-	double hAngle; // угол обзора камеры по горизонту
-	double vAngle; // угол обзора по вертикали
-	double dvAngle; // наклон камеры отн. горизонта
-	double Alt; // высота над полом
-	Point FrameSize; // размер кадра с видеокамеры
-	double vDist; // расстояние до экрана
+	double hAngle; // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	double vAngle; // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	double dvAngle; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	double Alt; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	cv::Point FrameSize; // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	double vDist; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	double hDist;
 	int y_hor;
 } vConfig;
@@ -33,7 +35,7 @@ public:
 
 	VideoCam(double h_angle, double v_angle, double dv_angle=0);
 
-	// инициализация необходимых констант
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	void InitVideo (double h_angle, double v_angle, double dv_angle=0);
 
 	void vSetAlt (double alt);
@@ -54,18 +56,18 @@ public:
 	// config 
 	void vSetConfig (vConfig &conf);
 
-	// рассчет точки поворота за угол
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ
 	CDPoint vDirectionRotate ();
 	CDPoint vDirectionRotate (Mat& image, bool vis,Mat& visimg);
 
-	// рассчет точки прохода проема
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	CDPoint vDirectionAperture (Mat& image, bool vis, Mat& visimg);
 
 	void vFilterImage ( Mat& source, Mat& dest);
 
 private:
 	vConfig config;
-	VideoCapture cap;
+	cv::VideoCapture cap;
 	Mat tempImg;
 	bool vis;
 	CDSection sect [MAX_SECT];
@@ -73,7 +75,7 @@ public:
 	Mat visimg;
 	Mat capt_img;
 	//****************************************************************************
-	//*    Функции поиска по изображению (возвращают достоверность результата)   *
+	//*    пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)   *
     //****************************************************************************
 	// search rotation point
 	int SearchRot(void);
