@@ -12,6 +12,7 @@
 #include <sys/file.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/resource.h>
 #include <execinfo.h>
 #include <unistd.h>
 #include <errno.h>
@@ -39,7 +40,7 @@ static void signal_error(int sig, siginfo_t *si, void *ptr);
 int SetFdLimit(int MaxFd);
 int WorkProc();
 void SetPidFile(const char* Filename);
-void SetLogFile(const char* Filename);
+
 int MonitorProc();
 
 int main (int argc, char** argv)
@@ -107,7 +108,7 @@ int ReloadConfig()
 
 void DestroyWorkThread()
 {
-	nd.kill ();
+	nd.stop ();
 	FCStop ();
 }
 
@@ -264,10 +265,6 @@ void SetPidFile(const char* Filename)
 		fprintf(f, "%u", getpid());
 		fclose(f);
 	}
-}
-void SetLogFile(const char* Filename)
-{
-	log_file = fopen(Filename, "a");
 }
 
 int MonitorProc()

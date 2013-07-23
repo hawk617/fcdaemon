@@ -20,7 +20,7 @@ class NetDaemon {
 
     public:
 	int start ();
-	void kill ();
+	void stop ();
     private:
 	int pid;
 };

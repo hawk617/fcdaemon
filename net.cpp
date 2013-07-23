@@ -11,11 +11,12 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <syslog.h>
 #include <signal.h>
 
 #include <vector>
-#include <string>
+#include <cstring>
 #include <fstream>
 
 #include "net.h"
@@ -51,6 +52,11 @@ int NetDaemon::start() {
     return pid;
 }
 
+void NetDaemon::stop() {
+	kill(pid, SIGTERM);
+}
+
+
 void NetDaemon::mainloop() {
     int sockfd, fd;
     struct sockaddr_in sa;
@@ -59,26 +65,30 @@ void NetDaemon::mainloop() {
     sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
     if(sockfd != -1) {
-	memset(&sa, 0, sizeof(sa));
+		memset(&sa, 0, sizeof(sa));
 
-	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = htonl(INADDR_ANY);
-	sa.sin_port = htons(1667);
+		sa.sin_family = AF_INET;
+		sa.sin_addr.s_addr = htonl(INADDR_ANY);
+		sa.sin_port = htons(1667);
 
-	if(bind(sockfd, (struct sockaddr *) &sa, sizeof(sa)) != -1) {
-	    while(1) {
-		if(!listen(sockfd, 5)) {
-		    n = sizeof(sa);
-		    if((fd = accept(sockfd, (struct sockaddr *) &sa, &n)) != -1) {
-			syslog(LOG_NOTICE, "connection from %s", inet_ntoa(sa.sin_addr));
+		if(bind(sockfd, (struct sockaddr *) &sa, sizeof(sa)) != -1) {
+			while(1) {
+				if(!listen(sockfd, 5)) {
+					n = sizeof(sa);
+					if((fd = accept(sockfd, (struct sockaddr *) &sa, &n)) != -1)
+					{
+						string s="[NETDAEMON]Connection from ";
+						s+=inet_ntoa(sa.sin_addr);
+						s+="\n";
+						WriteLog (s);
 
-			if(!fork()) {
-			    operate(fd);
+						if(!fork()) {
+							operate(fd);
+						}
+					}
+				}
 			}
-		    }
 		}
-	    }
-	}
     }
 }
 
@@ -143,7 +153,4 @@ void NetDaemon::operate(int fd) {
     exit(0);
 }
 
-void NetDaemon::kill() {
-
-}
 
