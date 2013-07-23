@@ -16,57 +16,52 @@
 #include <unistd.h>
 #include <errno.h>
 #include <wait.h>
-//#include "geometry/geometry.h"
 
-
+#include "net.h"
+#include "fc.h"
 
 #define FD_LIMIT                        1024*10
-
 #define CHILD_NEED_WORK                 1
 #define CHILD_NEED_TERMINATE    2
+#define DEFAULT_CONFIG_NAME "copter_daemon.cfg"
 
 #define PID_FILE "/var/run/copter_daemon.pid"
 #define LOG_FILE "/var/log/copter_daemon.log"
 
 static FILE* log_file=0;
+static int wpid=0;
+static int npid=0;
 
 void WriteLog(char* Msg);
-
 int LoadConfig(char* FileName);
-
 int ReloadConfig();
-
 void DestroyWorkThread();
-
 int InitWorkThread();
-
 static void signal_error(int sig, siginfo_t *si, void *ptr);
-
 int SetFdLimit(int MaxFd);
-
 int WorkProc();
-
 void SetPidFile(const char* Filename);
-
 void SetLogFile(const char* Filename);
-
-
 int MonitorProc();
-
-
 
 int main (int argc, char** argv)
 {
 	int status;
 	int pid;
 
-	if (argc != 2)
+	if (argc==1)
+	{
+		status = LoadConfig(DEFAULT_CONFIG_NAME);
+	}
+	else if (argc == 2)
+	{
+		status = LoadConfig(argv[1]);
+	}
+	else
 	{
 		printf("Usage: ./copter_daemon filename.cfg\n");
 		return -1;
 	}
-
-	status = LoadConfig(argv[1]);
 
 	if (!status)
 	{
@@ -109,20 +104,35 @@ void WriteLog(char* Msg)
 
 int LoadConfig(char* FileName)
 {
+	//TODO: Load config code.
 	return 1;
 }
 
 int ReloadConfig()
 {
+	//TODO: Reload config code.
 	return 1;
 }
 
 void DestroyWorkThread()
 {
+	NetStop ();
+	FCStop ();
 }
 
 int InitWorkThread()
 {
+	if (!NetStart())
+	{
+		WriteLog ("[DAEMON]Network not start\n");
+		return 0;
+	}
+	if (!FCStart())
+	{
+		WriteLog ("[DAEMON]Flight control not start\n");
+		return 0;
+	}
+
 	return 1;
 }
 
@@ -278,18 +288,12 @@ int MonitorProc()
 	siginfo_t siginfo;
 
 	sigemptyset(&sigset);
-
 	sigaddset(&sigset, SIGQUIT);
-
 	sigaddset(&sigset, SIGINT);
-
 	sigaddset(&sigset, SIGTERM);
-
 	sigaddset(&sigset, SIGCHLD);
-
 	sigaddset(&sigset, SIGCHLD);
-
-	sigaddset(&sigset, SIGUSR1);
+	sigaddset(&sigset, SIGUSR1); // reload config signal
 	sigprocmask(SIG_BLOCK, &sigset, NULL);
 
 	SetPidFile(PID_FILE);
@@ -344,7 +348,10 @@ int MonitorProc()
 			}
 			else
 			{
-				WriteLog("[MONITOR] Signal %s\n", strsignal(siginfo.si_signo));
+				char* s= new char[50];
+				sprintf (s,"[MONITOR] Signal %s\n", strsignal(siginfo.si_signo));
+				WriteLog(s);
+				delete s;
 
 				kill(pid, SIGTERM);
 				status = 0;
