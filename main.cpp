@@ -19,6 +19,7 @@
 
 #include "net.h"
 #include "fc.h"
+#include "log.h"
 
 #define FD_LIMIT                        1024*10
 #define CHILD_NEED_WORK                 1
@@ -26,13 +27,8 @@
 #define DEFAULT_CONFIG_NAME "copter_daemon.cfg"
 
 #define PID_FILE "/var/run/copter_daemon.pid"
-#define LOG_FILE "/var/log/copter_daemon.log"
 
-static FILE* log_file=0;
-static int wpid=0;
-static int npid=0;
 
-void WriteLog(char* Msg);
 int LoadConfig(char* FileName);
 int ReloadConfig();
 void DestroyWorkThread();
@@ -95,13 +91,6 @@ int main (int argc, char** argv)
 	}
 }
 
-
-void WriteLog(char* Msg)
-{
-	if (log_file==0) log_file=fopen(LOG_FILE, "a");
-	fprintf(log_file, Msg);
-}
-
 int LoadConfig(char* FileName)
 {
 	//TODO: Load config code.
@@ -122,12 +111,12 @@ void DestroyWorkThread()
 
 int InitWorkThread()
 {
-	if (!NetStart())
+	if (NetStart()==-1)
 	{
 		WriteLog ("[DAEMON]Network not start\n");
 		return 0;
 	}
-	if (!FCStart())
+	if (FCStart()==-1)
 	{
 		WriteLog ("[DAEMON]Flight control not start\n");
 		return 0;
