@@ -28,6 +28,8 @@
 
 #define PID_FILE "/var/run/copter_daemon.pid"
 
+static NetDaemon nd;
+
 
 int LoadConfig(char* FileName);
 int ReloadConfig();
@@ -105,13 +107,13 @@ int ReloadConfig()
 
 void DestroyWorkThread()
 {
-	NetStop ();
+	nd.kill ();
 	FCStop ();
 }
 
 int InitWorkThread()
 {
-	if (NetStart()==-1)
+	if (nd.start()==-1)
 	{
 		WriteLog ("[DAEMON]Network not start\n");
 		return 0;

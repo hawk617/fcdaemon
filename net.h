@@ -8,9 +8,21 @@
 #ifndef NET_H_
 #define NET_H_
 
-#define PORT_CON 6823 //--определяем порт который будет прослушивать наш эхо сервер
 
-int NetStart();
-void NetStop();
+class NetDaemon {
+    protected:
+	void daemonize();
+	void mainloop();
+
+	void operate(int fd);
+
+	static void sighandler(int signum);
+
+    public:
+	int start ();
+	void kill ();
+    private:
+	int pid;
+};
 
 #endif /* NET_H_ */
