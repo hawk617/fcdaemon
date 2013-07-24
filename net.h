@@ -11,7 +11,6 @@
 
 class NetDaemon {
     protected:
-	void daemonize();
 	void mainloop();
 
 	void operate(int fd);
