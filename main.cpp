@@ -114,6 +114,7 @@ void DestroyWorkThread()
 
 int InitWorkThread()
 {
+	WriteLog ("[DAEMON]Init Work thread\n");
 	if (nd.start()==-1)
 	{
 		WriteLog ("[DAEMON]Network not start\n");
@@ -306,6 +307,7 @@ int MonitorProc()
 		else if (!pid)
 		{
 			status = WorkProc();
+			WriteLog ("[MONITOR]WorkProk exit\n");
 			exit(status);
 		}
 		else

@@ -19,11 +19,10 @@ void WriteLog(string Msg)
 	struct tm *t_m;
 	t=time(NULL);
 	t_m=localtime(&t);
-	//cout<<"Local time is: "<<t_m->tm_hour<<":"<<t_m->tm_min<<":"<<t_m->tm_sec;
 
 	if (log_file==0) log_file=fopen(LOG_FILE, "a");
-	fprintf(log_file, "[%2d-%2d-%4d %2d:%2d:%2d]", t_m->tm_mday, t_m->tm_mon,
-			t_m->tm_year, t_m->tm_hour, t_m->tm_min, t_m->tm_sec);
+	fprintf(log_file, "[%02d-%02d-%04d %02d:%02d:%02d]", t_m->tm_mday, t_m->tm_mon,
+			t_m->tm_year+1900, t_m->tm_hour, t_m->tm_min, t_m->tm_sec);
 	fprintf(log_file, Msg.c_str());
 	delete t_m;
 }
