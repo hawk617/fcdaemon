@@ -25,7 +25,8 @@
 
 using namespace std;
 
-void fcdaemon::sighandler(int signum) {
+void fcdaemon::sighandler(int signum)
+{
     waitpid(0, 0, WNOHANG);
 }
 
@@ -40,25 +41,19 @@ void fcdaemon::daemonize() {
 	case 0:
 	    setsid();
 	    chdir("/");
-
 	    close(0);
 	    close(1);
 	    close(2);
-
 	    memset(&sa, 0, sizeof(sa));
 	    sa.sa_handler = &sighandler;
 	    sigaction(SIGCHLD, &sa, 0);
-
 	    openlog("fcdaemon", 0, LOG_USER);
 	    mainloop();
 	    closelog();
-
 	    exit(0);
-
 	case -1:
 	    cout << "fork() error" << endl;
 	    break;
-
 	default:
 	    cout << "ok. PID=" << pid << endl;
 	    break;
@@ -67,9 +62,17 @@ void fcdaemon::daemonize() {
 
 void fcdaemon::mainloop()
 {
-    int sockfd, fd;
+    int sockfd, cd;
+    int tfd[2];
+    vector<int> fd;
     struct sockaddr_in sa;
     socklen_t n;
+    if(pipe(tfd) == -1)
+    {
+    	syslog(LOG_ERR, "pipe failed");
+    	exit(1);
+    }
+
 
     sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -88,12 +91,12 @@ void fcdaemon::mainloop()
 				if(!listen(sockfd, 5))
 				{
 					n = sizeof(sa);
-					if((fd = accept(sockfd, (struct sockaddr *) &sa, &n)) != -1)
+					if((cd = accept(sockfd, (struct sockaddr *) &sa, &n)) != -1)
 					{
 						syslog(LOG_NOTICE, "connection from %s", inet_ntoa(sa.sin_addr));
 
 						if(!fork()) {
-							operate(fd);
+							operate(cd);
 						}
 					}
 				}
